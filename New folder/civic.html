@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicLens — Urban Issue Detector</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #12151c;
+    --surface2: #1a1f2b;
+    --border: #252b38;
+    --accent: #f0a500;
+    --accent2: #e05c2a;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --green: #22c55e;
+    --red: #ef4444;
+    --orange: #f97316;
+    --yellow: #eab308;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(240,165,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(240,165,0,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 48px;
+  }
+  .logo-icon {
+    width: 46px; height: 46px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+    box-shadow: 0 0 30px rgba(240,165,0,0.3);
+  }
+  .logo-text h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+  }
+  .logo-text p { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .lang-selector { position: absolute; top: 40px; right: 24px; }
+  .lang-selector select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .share-buttons { display: flex; gap: 8px; margin-top: 16px; }
+  .share-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .share-btn:hover { border-color: var(--accent); }
+  .meta-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 16px 0; }
+  .meta-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+  .meta-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .meta-value { font-size: 16px; font-weight: 600; color: var(--accent); margin-top: 4px; }
+  .location-input { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 10px; font-size: 14px; width: 100%; margin-bottom: 16px; }
+  .feature-badge { display: inline-block; background: rgba(240,165,0,0.1); border: 1px solid rgba(240,165,0,0.3); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin: 4px; }
+  .nav-link { position: absolute; top: 40px; right: 180px; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; font-size: 13px; text-decoration: none; }
+
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 20px;
+    padding: 60px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: var(--surface);
+    margin-bottom: 28px;
+    position: relative; overflow: hidden;
+  }
+  .upload-zone::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(240,165,0,0.06), transparent 70%);
+    pointer-events: none;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(240,165,0,0.04);
+  }
+  .upload-zone.has-image { padding: 20px; border-style: solid; border-color: var(--accent); }
+  .upload-icon { font-size: 48px; margin-bottom: 16px; display: block; opacity: 0.7; }
+  .upload-zone h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .upload-zone p { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  .browse-btn {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 14px; font-weight: 500;
+    color: var(--text); cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .browse-btn:hover { border-color: var(--accent); color: var(--accent); }
+  #fileInput { display: none; }
+  #preview { display: none; width: 100%; max-height: 380px; object-fit: contain; border-radius: 12px; margin-bottom: 16px; }
+  .image-actions { display: none; gap: 10px; justify-content: center; }
+  .clear-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); padding: 8px 18px; border-radius: 8px;
+    cursor: pointer; font-size: 13px; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .clear-btn:hover { border-color: var(--red); color: var(--red); }
+  .analyze-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 14px;
+    color: #fff; font-family: 'Syne', sans-serif;
+    font-size: 17px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.03em;
+    transition: all 0.25s;
+    box-shadow: 0 4px 24px rgba(240,165,0,0.25);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 36px;
+  }
+  .analyze-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(240,165,0,0.4); }
+  .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #results { display: none; }
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .results-header h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+  .overall-badge { padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+  .badge-critical { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .badge-high { background: rgba(249,115,22,0.15); color: var(--orange); border: 1px solid rgba(249,115,22,0.3); }
+  .badge-medium { background: rgba(234,179,8,0.15); color: var(--yellow); border: 1px solid rgba(234,179,8,0.3); }
+  .badge-low { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .badge-none { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px 24px; margin-bottom: 24px;
+    line-height: 1.65; font-size: 15px; color: #b0b8c8;
+  }
+  .issues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .issue-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+  .issue-card:hover { border-color: rgba(240,165,0,0.3); transform: translateY(-2px); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .issue-card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .issue-emoji { font-size: 28px; line-height: 1; flex-shrink: 0; }
+  .issue-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .severity-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 999px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .issue-desc { font-size: 13.5px; color: #8a94a6; line-height: 1.6; margin-bottom: 10px; }
+  .issue-location { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .issue-action { font-size: 13px; color: var(--accent); font-weight: 500; display: flex; align-items: flex-start; gap: 6px; margin-top: 12px; line-height: 1.5; }
+  .no-issues { text-align: center; padding: 48px 24px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); grid-column: 1/-1; }
+  .no-issues .icon { font-size: 48px; margin-bottom: 14px; display: block; }
+  .no-issues h3 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--green); }
+  .no-issues p { color: var(--muted); font-size: 14px; }
+  .error-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 12px; padding: 16px 20px; font-size: 14px; color: #fca5a5; display: none; margin-bottom: 20px; }
+  .recs-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+  .recs-section h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+  .rec-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .rec-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .rec-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(240,165,0,0.1); border: 1px solid rgba(240,165,0,0.3); color: var(--accent); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .rec-text { font-size: 14px; color: #b0b8c8; line-height: 1.55; }
+  .loading-overlay { text-align: center; padding: 60px 24px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); display: none; margin-bottom: 28px; }
+  .loading-overlay .big-spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+  .loading-overlay p { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--muted); }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="lang-selector">
+    <select id="langSelect" onchange="changeLang()">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="hi">हिन्दी</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+    </select>
+  </div>
+  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+  <header>
+    <div class="logo-icon">🔍</div>
+    <div class="logo-text">
+      <h1>CivicLens</h1>
+      <p>AI-Powered Urban Issue Detector</p>
+    </div>
+  </header>
+
+  <div class="upload-zone" id="uploadZone">
+    <span class="upload-icon">📷</span>
+    <h2>Upload an Urban Photo</h2>
+    <p>Drop or browse a photo of a street, drain, road, or public area</p>
+    <input type="text" id="locationInput" class="location-input" placeholder="📍 Enter location (optional)" style="display:none">
+    <button class="feature-badge" onclick="getLocation()">📍 Use My Location</button>
+    <label class="browse-btn" for="fileInput">Browse Files</label>
+    <input type="file" id="fileInput" accept="image/*">
+    <img id="preview" alt="Preview">
+    <div class="image-actions" id="imageActions">
+      <button class="clear-btn" onclick="clearImage()">✕ Remove Image</button>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <button class="analyze-btn" id="analyzeBtn" disabled onclick="analyzeImage()">
+    <span>🧠</span> Analyze for Civic Issues
+  </button>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="big-spinner"></div>
+    <p>Analyzing image...</p>
+  </div>
+
+  <div id="results">
+    <div class="results-header">
+      <h2>📋 Analysis Report</h2>
+      <span class="overall-badge" id="overallBadge"></span>
+    </div>
+    <div class="summary-card" id="summaryCard"></div>
+    <div class="meta-info" id="metaInfo" style="display:none">
+      <div class="meta-card"><div class="meta-label">Priority Score</div><div class="meta-value" id="priorityScore">-</div></div>
+      <div class="meta-card"><div class="meta-label">Estimated Cost</div><div class="meta-value" id="estimatedCost">-</div></div>
+      <div class="meta-card"><div class="meta-label">Safety Risk</div><div class="meta-value" id="safetyRisk">-</div></div>
+      <div class="meta-card"><div class="meta-label">Environmental Impact</div><div class="meta-value" id="envImpact">-</div></div>
+    </div>
+    <div class="share-buttons" id="shareButtons" style="display:none">
+      <button class="share-btn" onclick="shareTwitter()">🐦 Twitter</button>
+      <button class="share-btn" onclick="shareFacebook()">📘 Facebook</button>
+      <button class="share-btn" onclick="shareWhatsApp()">💬 WhatsApp</button>
+      <button class="share-btn" onclick="downloadPDF()">📄 PDF Report</button>
+    </div>
+    <div class="issues-grid" id="issuesGrid"></div>
+    <div class="recs-section" id="recsSection" style="display:none">
+      <h3>🛠️ Recommended Actions</h3>
+      <div id="recsList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  const preview = document.getElementById('preview');
+  const imageActions = document.getElementById('imageActions');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const errorBox = document.getElementById('errorBox');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const resultsDiv = document.getElementById('results');
+
+  const translations = {
+    en: { title: 'CivicLens', subtitle: 'AI-Powered Urban Issue Detector', upload: 'Upload an Urban Photo', uploadDesc: 'Drop or browse a photo of a street, drain, road, or public area', browse: 'Browse Files', remove: '✕ Remove Image', analyze: '🧠 Analyze for Civic Issues', analyzing: 'Analyzing image...', report: '📋 Analysis Report', noIssues: 'No Civic Issues Detected', noIssuesDesc: 'This area appears to be well-maintained with no visible civic problems.', recommendations: '🛠️ Recommended Actions' },
+    es: { title: 'CivicLens', subtitle: 'Detector de Problemas Urbanos con IA', upload: 'Subir una Foto Urbana', uploadDesc: 'Arrastra o busca una foto de una calle, desagüe, carretera o área pública', browse: 'Buscar Archivos', remove: '✕ Eliminar Imagen', analyze: '🧠 Analizar Problemas Cívicos', analyzing: 'Analizando imagen...', report: '📋 Informe de Análisis', noIssues: 'No se Detectaron Problemas Cívicos', noIssuesDesc: 'Esta área parece estar bien mantenida sin problemas cívicos visibles.', recommendations: '🛠️ Acciones Recomendadas' },
+    hi: { title: 'CivicLens', subtitle: 'AI-संचालित शहरी समस्या डिटेक्टर', upload: 'शहरी फोटो अपलोड करें', uploadDesc: 'सड़क, नाली, सड़क या सार्वजनिक क्षेत्र की फोटो खींचें या ब्राउज़ करें', browse: 'फ़ाइलें ब्राउज़ करें', remove: '✕ छवि हटाएं', analyze: '🧠 नागरिक समस्याओं का विश्लेषण करें', analyzing: 'छवि का विश्लेषण...', report: '📋 विश्लेषण रिपोर्ट', noIssues: 'कोई नागरिक समस्या नहीं मिली', noIssuesDesc: 'यह क्षेत्र अच्छी तरह से बनाए रखा गया प्रतीत होता है।', recommendations: '🛠️ अनुशंसित कार्रवाई' },
+    fr: { title: 'CivicLens', subtitle: 'Détecteur de Problèmes Urbains IA', upload: 'Télécharger une Photo Urbaine', uploadDesc: 'Déposez ou parcourez une photo de rue, drain, route ou zone publique', browse: 'Parcourir les Fichiers', remove: '✕ Supprimer l\'Image', analyze: '🧠 Analyser les Problèmes Civiques', analyzing: 'Analyse de l\'image...', report: '📋 Rapport d\'Analyse', noIssues: 'Aucun Problème Civique Détecté', noIssuesDesc: 'Cette zone semble bien entretenue sans problèmes civiques visibles.', recommendations: '🛠️ Actions Recommandées' },
+    de: { title: 'CivicLens', subtitle: 'KI-gestützter städtischer Problemdetektor', upload: 'Städtisches Foto Hochladen', uploadDesc: 'Ziehen Sie ein Foto von Straße, Abfluss, Straße oder öffentlichem Bereich', browse: 'Dateien Durchsuchen', remove: '✕ Bild Entfernen', analyze: '🧠 Auf Bürgerprobleme Analysieren', analyzing: 'Bild wird analysiert...', report: '📋 Analysebericht', noIssues: 'Keine Bürgerprobleme Erkannt', noIssuesDesc: 'Dieser Bereich scheint gut gepflegt zu sein.', recommendations: '🛠️ Empfohlene Maßnahmen' }
+  };
+  let currentLang = 'en';
+
+  function changeLang() {
+    currentLang = document.getElementById('langSelect').value;
+    const t = translations[currentLang];
+    document.querySelector('.logo-text h1').textContent = t.title;
+    document.querySelector('.logo-text p').textContent = t.subtitle;
+    document.querySelector('.upload-zone h2').textContent = t.upload;
+    document.querySelector('.upload-zone p').textContent = t.uploadDesc;
+    document.querySelector('.browse-btn').textContent = t.browse;
+    document.querySelector('.analyze-btn').innerHTML = t.analyze;
+    document.querySelector('.loading-overlay p').textContent = t.analyzing;
+    if (resultsDiv.style.display === 'block') {
+      document.querySelector('.results-header h2').textContent = t.report;
+    }
+  }
+
+  let currentImageBase64 = null;
+  let currentMimeType = null;
+  let currentLocation = null;
+
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        currentLocation = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+        document.getElementById('locationInput').value = currentLocation;
+        document.getElementById('locationInput').style.display = 'block';
+      }, () => {
+        alert('Unable to get location. Please enter manually.');
+        document.getElementById('locationInput').style.display = 'block';
+      });
+    }
+  }
+
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) loadFile(file);
+  });
+
+  uploadZone.addEventListener('click', e => {
+    if (e.target.classList.contains('clear-btn') || e.target.closest('.browse-btn') || e.target.id === 'fileInput') return;
+    if (!uploadZone.classList.contains('has-image')) fileInput.click();
+  });
+
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+  function loadFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      currentMimeType = file.type;
+      currentImageBase64 = dataUrl.split(',')[1];
+      preview.src = dataUrl;
+      preview.style.display = 'block';
+      imageActions.style.display = 'flex';
+      uploadZone.classList.add('has-image');
+      uploadZone.querySelector('.upload-icon').style.display = 'none';
+      uploadZone.querySelector('h2').style.display = 'none';
+      uploadZone.querySelector('p').style.display = 'none';
+      uploadZone.querySelector('.browse-btn').style.display = 'none';
+      updateBtn();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearImage() {
+    currentImageBase64 = null;
+    preview.style.display = 'none';
+    preview.src = '';
+    imageActions.style.display = 'none';
+    uploadZone.classList.remove('has-image');
+    uploadZone.querySelector('.upload-icon').style.display = 'block';
+    uploadZone.querySelector('h2').style.display = 'block';
+    uploadZone.querySelector('p').style.display = 'block';
+    uploadZone.querySelector('.browse-btn').style.display = 'inline-block';
+    fileInput.value = '';
+    resultsDiv.style.display = 'none';
+    loadingOverlay.style.display = 'none';
+    hideError();
+    updateBtn();
+  }
+
+  function updateBtn() { analyzeBtn.disabled = !currentImageBase64; }
+  function showError(msg) { errorBox.textContent = '⚠️ ' + msg; errorBox.style.display = 'block'; }
+  function hideError() { errorBox.style.display = 'none'; }
+
+  const SEV = {
+    critical: { cls: 'badge-critical', label: 'Critical', tagBg: 'rgba(239,68,68,0.15)', tagClr: '#ef4444' },
+    high:     { cls: 'badge-high',     label: 'High',     tagBg: 'rgba(249,115,22,0.15)', tagClr: '#f97316' },
+    medium:   { cls: 'badge-medium',   label: 'Medium',   tagBg: 'rgba(234,179,8,0.15)',  tagClr: '#eab308' },
+    low:      { cls: 'badge-low',      label: 'Low',      tagBg: 'rgba(34,197,94,0.15)', tagClr: '#22c55e' },
+    none:     { cls: 'badge-none',     label: 'None',     tagBg: 'rgba(34,197,94,0.15)', tagClr: '#22c55e' },
+  };
+
+  const EMOJIS = { drain: '🚿', garbage: '🗑️', pothole: '🕳️', sewage: '🧫', graffiti: '🎨', flood: '🌊', water: '💧', construct: '🏗️', road: '🛣️', electric: '⚡', sanit: '🧹', pollut: '🏭', illegal: '🚫', manhole: '⚠️', waste: '🗑️', litter: '🗑️' };
+  function getEmoji(type) {
+    const t = type.toLowerCase();
+    for (const [k, v] of Object.entries(EMOJIS)) { if (t.includes(k)) return v; }
+    return '📍';
+  }
+
+  async function analyzeImage() {
+    hideError();
+    analyzeBtn.disabled = true;
+    resultsDiv.style.display = 'none';
+    loadingOverlay.style.display = 'block';
+
+    try {
+      const location = document.getElementById('locationInput').value || currentLocation;
+      const res = await fetch('http://localhost:3000/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: currentImageBase64, mimeType: currentMimeType, language: currentLang, location })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Analysis failed');
+      }
+
+      const data = await res.json();
+      renderResults(data);
+    } catch (err) {
+      loadingOverlay.style.display = 'none';
+      showError(err.message);
+      analyzeBtn.disabled = false;
+      updateBtn();
+    }
+  }
+
+  function renderResults(data) {
+    loadingOverlay.style.display = 'none';
+    resultsDiv.style.display = 'block';
+    document.getElementById('shareButtons').style.display = 'flex';
+    window.currentReportId = data.id;
+
+    const sev = (data.overall_severity || 'low').toLowerCase();
+    const sm = SEV[sev] || SEV.low;
+    const badge = document.getElementById('overallBadge');
+    badge.textContent = sev === 'none' ? '✅ No Issues Found' : `⚠ ${sm.label} Severity`;
+    badge.className = `overall-badge ${sm.cls}`;
+
+    document.getElementById('summaryCard').textContent = data.summary || '';
+
+    if (data.priority_score || data.estimated_cost || data.public_safety_risk || data.environmental_impact) {
+      document.getElementById('metaInfo').style.display = 'grid';
+      document.getElementById('priorityScore').textContent = data.priority_score || 'N/A';
+      document.getElementById('estimatedCost').textContent = data.estimated_cost || 'N/A';
+      document.getElementById('safetyRisk').textContent = data.public_safety_risk || 'N/A';
+      document.getElementById('envImpact').textContent = data.environmental_impact || 'N/A';
+    }
+
+    const grid = document.getElementById('issuesGrid');
+    grid.innerHTML = '';
+
+    if (!data.issues || data.issues.length === 0) {
+      grid.innerHTML = `<div class="no-issues"><span class="icon">🌟</span><h3>No Civic Issues Detected</h3><p>This area appears to be well-maintained with no visible civic problems.</p></div>`;
+    } else {
+      data.issues.forEach((issue, i) => {
+        const s = (issue.severity || 'low').toLowerCase();
+        const sm2 = SEV[s] || SEV.low;
+        const card = document.createElement('div');
+        card.className = 'issue-card';
+        card.style.animationDelay = `${i * 0.08}s`;
+        card.innerHTML = `
+          <div class="issue-card-header">
+            <span class="issue-emoji">${getEmoji(issue.type)}</span>
+            <div>
+              <div class="issue-title">${issue.type}</div>
+              <span class="severity-tag" style="background:${sm2.tagBg};color:${sm2.tagClr};border:1px solid ${sm2.tagClr}40">${sm2.label}</span>
+              ${issue.department ? `<span class="feature-badge">${issue.department}</span>` : ''}
+            </div>
+          </div>
+          <div class="issue-desc">${issue.description}</div>
+          ${issue.location_hint ? `<div class="issue-location">📍 ${issue.location_hint}</div>` : ''}
+          ${issue.estimated_time ? `<div class="issue-location">⏱️ ${issue.estimated_time}</div>` : ''}
+          ${issue.recommended_action ? `<div class="issue-action">→ ${issue.recommended_action}</div>` : ''}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    const recsSection = document.getElementById('recsSection');
+    const recsList = document.getElementById('recsList');
+    if (data.recommendations && data.recommendations.length > 0) {
+      recsList.innerHTML = data.recommendations.map((r, i) => `
+        <div class="rec-item">
+          <div class="rec-num">${i + 1}</div>
+          <div class="rec-text">${r}</div>
+        </div>`).join('');
+      recsSection.style.display = 'block';
+    } else {
+      recsSection.style.display = 'none';
+    }
+
+    analyzeBtn.disabled = false;
+    updateBtn();
+    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    checkNotifications();
+  }
+
+  function shareTwitter() {
+    const text = `I found civic issues using CivicLens! Check out the AI-powered urban issue detector.`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+  }
+
+  function shareFacebook() {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+  }
+
+  function shareWhatsApp() {
+    const text = `I found civic issues using CivicLens! ${window.location.href}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  }
+
+  function downloadPDF() {
+    if (!window.currentReportId) {
+      alert('Please analyze an image first');
+      return;
+    }
+    window.open(`http://localhost:3000/api/reports/${window.currentReportId}/pdf`, '_blank');
+  }
+
+  async function checkNotifications() {
+    try {
+      const res = await fetch('http://localhost:3000/api/notifications');
+      const notifs = await res.json();
+      if (notifs.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
+        notifs.forEach(n => {
+          new Notification('CivicLens Alert', { body: n.message, icon: '🔍' });
+        });
+      }
+    } catch (err) {
+      console.error('Notification check failed:', err);
+    }
+  }
+
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+  
+  setInterval(checkNotifications, 30000);
+</script>
+</body>
+</html>

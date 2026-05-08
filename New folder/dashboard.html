@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicLens Pro — Advanced Features</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui; background: #0a0c10; color: #e8eaf0; }
+  .dashboard { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: #12151c; border: 1px solid #252b38; border-radius: 12px; padding: 20px; }
+  .stat-value { font-size: 32px; font-weight: 700; color: #f0a500; }
+  .stat-label { font-size: 13px; color: #6b7280; margin-top: 4px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .feature-card { background: #12151c; border: 1px solid #252b38; border-radius: 16px; padding: 24px; }
+  .feature-card h3 { color: #f0a500; margin-bottom: 12px; font-size: 18px; }
+  .feature-card p { color: #8a94a6; font-size: 14px; line-height: 1.6; }
+  .btn { background: linear-gradient(135deg, #f0a500, #e05c2a); border: none; color: #fff; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 12px; }
+  .btn:hover { opacity: 0.9; }
+  h1 { margin-bottom: 32px; font-size: 28px; }
+  .map-container { height: 400px; background: #12151c; border: 1px solid #252b38; border-radius: 12px; margin-bottom: 32px; }
+  .chart-container { background: #12151c; border: 1px solid #252b38; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .reports-list { background: #12151c; border: 1px solid #252b38; border-radius: 12px; padding: 20px; }
+  .report-item { padding: 12px; border-bottom: 1px solid #252b38; display: flex; justify-content: space-between; align-items: center; }
+  .report-item:last-child { border-bottom: none; }
+  .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+  .status-pending { background: rgba(234,179,8,0.15); color: #eab308; }
+  .status-resolved { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .notification-badge { position: absolute; top: -8px; right: -8px; background: #ef4444; color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  .notification-panel { position: fixed; top: 20px; right: 20px; background: #12151c; border: 1px solid #252b38; border-radius: 12px; padding: 16px; max-width: 300px; display: none; z-index: 1000; }
+  .notification-item { padding: 10px; border-bottom: 1px solid #252b38; font-size: 13px; }
+  .bell-icon { position: relative; cursor: pointer; font-size: 24px; }
+  .back-link { position: absolute; top: 40px; left: 20px; background: #12151c; border: 1px solid #252b38; color: #f0a500; padding: 8px 16px; border-radius: 8px; font-size: 13px; text-decoration: none; }
+  .back-link:hover { background: #1a1f2b; }
+</style>
+</head>
+<body>
+<a href="civic.html" class="back-link">← Back to CivicLens</a>
+<div class="dashboard">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>🚀 CivicLens Pro Dashboard</h1>
+    <div class="bell-icon" onclick="toggleNotifications()">
+      🔔
+      <span class="notification-badge" id="notifBadge" style="display:none">0</span>
+    </div>
+  </div>
+  
+  <div class="notification-panel" id="notifPanel"></div>
+  
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+      <div class="stat-value" id="totalReports">0</div>
+      <div class="stat-label">Total Reports</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="criticalIssues">0</div>
+      <div class="stat-label">Critical Issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="totalIssues">0</div>
+      <div class="stat-label">Total Issues Found</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="resolvedRate">0%</div>
+      <div class="stat-label">Resolution Rate</div>
+    </div>
+  </div>
+
+  <div class="map-container" id="map"></div>
+
+  <div class="chart-container">
+    <h3 style="color: #f0a500; margin-bottom: 16px;">📈 Trends Analysis</h3>
+    <canvas id="trendsChart" height="80"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3 style="color: #f0a500; margin-bottom: 16px;">🏢 Department Distribution</h3>
+    <canvas id="deptChart" height="80"></canvas>
+  </div>
+
+  <div class="reports-list">
+    <h3 style="color: #f0a500; margin-bottom: 16px;">📋 Recent Reports</h3>
+    <div id="reportsList"></div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h3>🗺️ Geolocation Tracking</h3>
+      <p>Automatically capture GPS coordinates with each report. Track issues on an interactive map and identify problem hotspots in your city.</p>
+      <button class="btn" onclick="getLocation()">Enable Location</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>📊 Analytics Dashboard</h3>
+      <p>Real-time statistics, trend analysis, and predictive insights. Track resolution rates, response times, and department performance.</p>
+      <button class="btn" onclick="loadStats()">View Analytics</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>🔔 Smart Notifications</h3>
+      <p>Get instant alerts for critical issues. Push notifications for status updates, nearby problems, and community engagement.</p>
+      <button class="btn" onclick="enableNotifications()">Enable Alerts</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>💰 Cost Estimation</h3>
+      <p>AI-powered cost prediction for repairs. Budget planning tools and resource allocation recommendations for municipal authorities.</p>
+      <button class="btn">View Estimates</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>⏱️ Priority Scoring</h3>
+      <p>Intelligent urgency ranking (1-10 scale). Helps authorities prioritize critical infrastructure issues for faster resolution.</p>
+      <button class="btn">See Priorities</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>🏢 Department Routing</h3>
+      <p>Automatic assignment to responsible departments. Streamlined workflow from detection to resolution with accountability tracking.</p>
+      <button class="btn">View Routing</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>📈 Trend Analysis</h3>
+      <p>Historical data visualization and pattern recognition. Identify recurring problems and seasonal trends for proactive maintenance.</p>
+      <button class="btn">View Trends</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>🌍 Environmental Impact</h3>
+      <p>Assess ecological consequences of civic issues. Carbon footprint tracking and sustainability recommendations for green cities.</p>
+      <button class="btn">View Impact</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>⚠️ Safety Risk Assessment</h3>
+      <p>Public safety evaluation for each issue. Risk scoring helps prevent accidents and protects community wellbeing.</p>
+      <button class="btn">Check Safety</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>📱 Mobile App Integration</h3>
+      <p>Native iOS and Android apps. Offline mode, camera integration, and seamless sync across all devices.</p>
+      <button class="btn">Download App</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>🤝 Community Engagement</h3>
+      <p>Citizen voting on issue priority. Comments, updates, and collaborative problem-solving with local communities.</p>
+      <button class="btn">Join Community</button>
+    </div>
+
+    <div class="feature-card">
+      <h3>📄 PDF Report Generation</h3>
+      <p>Professional reports for authorities. Detailed documentation with images, analysis, and actionable recommendations.</p>
+      <button class="btn" onclick="generatePDF()">Generate PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let map, markers = [];
+  
+  async function loadStats() {
+    try {
+      const res = await fetch('http://localhost:3000/api/stats');
+      const stats = await res.json();
+      document.getElementById('totalReports').textContent = stats.total_reports;
+      document.getElementById('criticalIssues').textContent = stats.critical;
+      document.getElementById('totalIssues').textContent = stats.total_issues;
+      document.getElementById('resolvedRate').textContent = stats.total_reports > 0 ? 
+        Math.round((stats.resolved / stats.total_reports) * 100) + '%' : '0%';
+    } catch (err) {
+      console.error('Failed to load stats:', err);
+    }
+  }
+
+  async function loadMap() {
+    map = L.map('map').setView([28.6139, 77.2090], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const res = await fetch('http://localhost:3000/api/map-data');
+    const data = await res.json();
+    
+    data.forEach(point => {
+      const color = point.severity === 'critical' ? 'red' : 
+                    point.severity === 'high' ? 'orange' : 
+                    point.severity === 'medium' ? 'yellow' : 'green';
+      
+      const marker = L.circleMarker([point.lat, point.lng], {
+        radius: 8,
+        fillColor: color,
+        color: '#fff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+      }).addTo(map);
+      
+      marker.bindPopup('<b>Report #' + point.id + '</b><br>' + point.summary + '<br>Issues: ' + point.issues);
+      markers.push(marker);
+    });
+  }
+
+  async function loadTrends() {
+    const res = await fetch('http://localhost:3000/api/analytics/trends');
+    const data = await res.json();
+    
+    const ctx1 = document.getElementById('trendsChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: Object.keys(data.daily),
+        datasets: [{
+          label: 'Reports per Day',
+          data: Object.values(data.daily),
+          borderColor: '#f0a500',
+          backgroundColor: 'rgba(240,165,0,0.1)',
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#e8eaf0' } } },
+        scales: {
+          y: { ticks: { color: '#6b7280' }, grid: { color: '#252b38' } },
+          x: { ticks: { color: '#6b7280' }, grid: { color: '#252b38' } }
+        }
+      }
+    });
+
+    const ctx2 = document.getElementById('deptChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(data.by_department),
+        datasets: [{
+          label: 'Issues by Department',
+          data: Object.values(data.by_department),
+          backgroundColor: ['#f0a500', '#e05c2a', '#22c55e', '#eab308', '#ef4444']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { color: '#6b7280' }, grid: { color: '#252b38' } },
+          x: { ticks: { color: '#6b7280' }, grid: { color: '#252b38' } }
+        }
+      }
+    });
+  }
+
+  async function loadReports() {
+    const res = await fetch('http://localhost:3000/api/reports');
+    const reports = await res.json();
+    
+    const list = document.getElementById('reportsList');
+    list.innerHTML = reports.slice(-10).reverse().map(r => 
+      '<div class="report-item"><div><strong>Report #' + r.id + '</strong> - ' + r.location + 
+      '<br><small style="color: #6b7280;">' + new Date(r.timestamp).toLocaleString() + 
+      '</small></div><div><span class="status-badge status-' + r.status + '">' + r.status + 
+      '</span><button class="btn" style="margin-left: 8px; padding: 6px 12px; font-size: 12px;" onclick="downloadPDF(' + r.id + ')">📄 PDF</button></div></div>'
+    ).join('');
+  }
+
+  async function loadNotifications() {
+    const res = await fetch('http://localhost:3000/api/notifications');
+    const notifs = await res.json();
+    
+    const badge = document.getElementById('notifBadge');
+    if (notifs.length > 0) {
+      badge.textContent = notifs.length;
+      badge.style.display = 'flex';
+    }
+  }
+
+  function toggleNotifications() {
+    const panel = document.getElementById('notifPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    
+    if (panel.style.display === 'block') {
+      fetch('http://localhost:3000/api/notifications')
+        .then(r => r.json())
+        .then(notifs => {
+          panel.innerHTML = notifs.length > 0 ? 
+            notifs.map(n => '<div class="notification-item">' + n.message + '</div>').join('') :
+            '<div class="notification-item">No new notifications</div>';
+        });
+    }
+  }
+
+  function downloadPDF(id) {
+    window.open('http://localhost:3000/api/reports/' + id + '/pdf', '_blank');
+  }
+
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        alert('Location captured: ' + pos.coords.latitude + ', ' + pos.coords.longitude);
+      });
+    }
+  }
+
+  function enableNotifications() {
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification('CivicLens', { body: 'Notifications enabled!' });
+        }
+      });
+    }
+  }
+
+  function generatePDF() {
+    alert('PDF generation feature - would create detailed report with all analysis data');
+  }
+
+  loadStats();
+  loadMap();
+  loadTrends();
+  loadReports();
+  loadNotifications();
+  setInterval(loadNotifications, 30000);
+</script>
+</body>
+</html>
