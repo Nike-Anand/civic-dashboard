@@ -1,0 +1,40 @@
+.statistics-card {
+    background-color: white;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .statistics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .statistics-icon {
+    font-size: 2rem;
+    margin-right: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .statistics-content {
+    flex: 1;
+  }
+  
+  .statistics-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0;
+    color: var(--heading-color);
+  }
+  
+  .statistics-title {
+    color: var(--text-color);
+    margin-bottom: 0;
+    font-size: 0.9rem;
+  }
+  

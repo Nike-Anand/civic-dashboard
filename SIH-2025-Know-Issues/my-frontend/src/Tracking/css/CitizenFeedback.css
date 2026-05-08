@@ -1,0 +1,119 @@
+.citizen-feedback {
+    background-color: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .citizen-feedback h3 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-sm);
+  }
+  
+  .feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .form-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    resize: vertical;
+    min-height: 100px;
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+  }
+  
+  textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+  }
+  
+  .rating {
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+  
+  .star {
+    font-size: 1.5rem;
+    color: var(--gray);
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .star.selected {
+    color: gold;
+  }
+  
+  .star:hover {
+    color: yellow;
+  }
+  
+  .error-text {
+    color: var(--danger);
+    font-size: 0.9rem;
+    margin-top: var(--spacing-xs);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary);
+    color: white;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: flex-start;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+  
+  /* Dark mode support */
+  .dark-mode .citizen-feedback {
+    background-color: var(--bg-secondary);
+  }
+  
+  .dark-mode textarea {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .citizen-feedback {
+      padding: var(--spacing-sm);
+    }
+  
+    .btn-primary {
+      width: 100%;
+    }
+  }
+  

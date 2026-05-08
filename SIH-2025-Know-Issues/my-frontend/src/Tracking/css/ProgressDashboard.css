@@ -1,0 +1,233 @@
+/* ProgressDashboard.css */
+
+.progress-dashboard {
+    background-color: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .dashboard-title {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-sm);
+  }
+  
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .stat-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    border-top: 3px solid var(--primary);
+  }
+  
+  .stat-card h4 {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+  }
+  
+  .stat-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+  
+  .stat-card.pending {
+    border-top-color: var(--status-reported);
+  }
+  
+  .stat-card.in-progress {
+    border-top-color: var(--status-in-progress);
+  }
+  
+  .stat-card.resolved {
+    border-top-color: var(--status-resolved);
+  }
+  
+  .dashboard-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .filter-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .filter-group select {
+    padding: 0.5rem var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    cursor: pointer;
+  }
+  
+  .complaints-table-container {
+    overflow-x: auto;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .complaints-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  
+  .complaints-table th {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    text-align: left;
+    padding: var(--spacing-sm);
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+  }
+  
+  .complaints-table td {
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+  
+  .complaints-table tr:hover {
+    background-color: var(--bg-secondary);
+  }
+  
+  .severity-badge, .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+  }
+  
+  .severity-badge.severity-high {
+    background-color: rgba(var(--severity-high-rgb, 231, 76, 60), 0.2);
+    color: var(--severity-high, #e74c3c);
+  }
+  
+  .severity-badge.severity-medium {
+    background-color: rgba(var(--severity-medium-rgb, 243, 156, 18), 0.2);
+    color: var(--severity-medium, #f39c12);
+  }
+  
+  .severity-badge.severity-low {
+    background-color: rgba(var(--severity-low-rgb, 52, 152, 219), 0.2);
+    color: var(--severity-low, #3498db);
+  }
+  
+  .status-badge.status-pending {
+    background-color: rgba(var(--status-reported-rgb, 243, 156, 18), 0.2);
+    color: var(--status-reported, #f39c12);
+  }
+  
+  .status-badge.status-in-progress {
+    background-color: rgba(var(--status-in-progress-rgb, 52, 152, 219), 0.2);
+    color: var(--status-in-progress, #3498db);
+  }
+  
+  .status-badge.status-assigned {
+    background-color: rgba(var(--primary-rgb, 67, 97, 238), 0.2);
+    color: var(--primary, #4361ee);
+  }
+  
+  .status-badge.status-resolved {
+    background-color: rgba(var(--status-resolved-rgb, 46, 204, 113), 0.2);
+    color: var(--status-resolved, #2ecc71);
+  }
+  
+  .progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background-color: var(--primary);
+    border-radius: var(--radius-full);
+  }
+  
+  .progress-text {
+    position: absolute;
+    right: 0;
+    top: -18px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+  
+  .no-complaints {
+    text-align: center;
+    padding: var(--spacing-lg);
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+  
+  /* Dark mode support */
+  .dark-mode .stat-card {
+    background-color: var(--bg-secondary);
+  }
+  
+  .dark-mode .complaints-table th {
+    background-color: var(--bg-secondary);
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .dashboard-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dashboard-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .filter-group {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .filter-group select {
+      width: 100%;
+    }
+    
+    .complaints-table th, 
+    .complaints-table td {
+      padding: var(--spacing-xs);
+      font-size: 0.8rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .dashboard-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+  

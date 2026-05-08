@@ -1,0 +1,125 @@
+/* ComplaintTrackingPage.css */
+
+.complaint-tracking-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+  }
+  
+  .complaint-header {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .complaint-header h1 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+  }
+  
+  .complaint-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .meta-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  
+  .meta-value {
+    color: var(--text-primary);
+  }
+  
+  .complaint-description {
+    background-color: var(--bg-tertiary);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .complaint-description h2 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+  }
+  
+  .complaint-description p {
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  
+  .tracking-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .tracking-section h2 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    font-size: 1.5rem;
+  }
+  
+  .tracking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .activity-section, .documents-section {
+    min-height: 400px;
+  }
+  
+  .feedback-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .dashboard-section {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .dashboard-section h2 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    font-size: 1.5rem;
+  }
+  
+  .loading-spinner, .error-message, .not-found {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+  }
+  
+  .error-message {
+    color: var(--danger);
+  }
+  
+  /* Dark mode support */
+  .dark-mode .complaint-description {
+    background-color: var(--bg-secondary);
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .complaint-tracking-page {
+      padding: var(--spacing-md);
+    }
+    
+    .tracking-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .complaint-meta {
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+  }
+  

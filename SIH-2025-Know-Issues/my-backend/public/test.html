@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Test Registration</h1>
+    <form id="registerForm">
+        <div>
+            <label>Name:</label>
+            <input type="text" id="name" value="Test User">
+        </div>
+        <div>
+            <label>Email:</label>
+            <input type="email" id="email" value="test@example.com">
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" id="password" value="password">
+        </div>
+        <div>
+            <label>Confirm Password:</label>
+            <input type="password" id="password_confirmation" value="password">
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value,
+                    password_confirmation: document.getElementById('password_confirmation').value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                document.getElementById('result').textContent = 'Error: ' + error;
+            });
+        });
+    </script>
+</body>
+</html>

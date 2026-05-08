@@ -1,0 +1,130 @@
+/* StatusBadge.css */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    transition: all 0.3s ease;
+    cursor: default;
+    margin: 0.25rem;
+  }
+  
+  /* Status-specific styling */
+  .status-badge.status-pending {
+    background-color: rgba(var(--status-reported-rgb, 243, 156, 18), 0.2);
+    color: var(--status-reported, #f39c12);
+  }
+  
+  .status-badge.status-verified {
+    background-color: rgba(var(--accent-rgb, 76, 201, 240), 0.2);
+    color: var(--accent, #4cc9f0);
+  }
+  
+  .status-badge.status-in-progress {
+    background-color: rgba(var(--status-in-progress-rgb, 52, 152, 219), 0.2);
+    color: var(--status-in-progress, #3498db);
+  }
+  
+  .status-badge.status-assigned {
+    background-color: rgba(var(--primary-rgb, 67, 97, 238), 0.2);
+    color: var(--primary, #4361ee);
+  }
+  
+  .status-badge.status-resolved {
+    background-color: rgba(var(--status-resolved-rgb, 46, 204, 113), 0.2);
+    color: var(--status-resolved, #2ecc71);
+  }
+  
+  .status-badge.status-rejected {
+    background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.2);
+    color: var(--danger, #e74c3c);
+  }
+  
+  /* Large variant */
+  .status-badge.status-badge-large {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+  
+  /* Icon styling */
+  .status-badge .status-icon {
+    margin-right: 0.5rem;
+    font-size: 1.1em;
+  }
+  
+  /* Hover effect */
+  .status-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  /* Dark mode support */
+  .dark-mode .status-badge.status-pending {
+    background-color: rgba(var(--status-reported-rgb, 243, 156, 18), 0.3);
+  }
+  
+  .dark-mode .status-badge.status-verified {
+    background-color: rgba(var(--accent-rgb, 76, 201, 240), 0.3);
+  }
+  
+  .dark-mode .status-badge.status-in-progress {
+    background-color: rgba(var(--status-in-progress-rgb, 52, 152, 219), 0.3);
+  }
+  
+  .dark-mode .status-badge.status-assigned {
+    background-color: rgba(var(--primary-rgb, 67, 97, 238), 0.3);
+  }
+  
+  .dark-mode .status-badge.status-resolved {
+    background-color: rgba(var(--status-resolved-rgb, 46, 204, 113), 0.3);
+  }
+  
+  .dark-mode .status-badge.status-rejected {
+    background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.3);
+  }
+  
+  /* Demo display styling */
+  .status-badge-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .status-badge-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .status-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .status-badge {
+      padding: 0.2rem 0.6rem;
+      font-size: 0.8rem;
+    }
+    
+    .status-badge.status-badge-large {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+    }
+    
+    .status-badge-row {
+      justify-content: center;
+    }
+  }
+  

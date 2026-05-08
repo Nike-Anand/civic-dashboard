@@ -1,0 +1,329 @@
+.user-management-container {
+    padding: var(--spacing-lg);
+    background-color: var(--layout-body-background);
+    min-height: 100vh;
+  }
+  
+  .user-management-title {
+    color: var(--heading-color);
+    margin-bottom: var(--spacing-lg);
+    font-weight: 700;
+  }
+  
+  .user-management-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .search-filter-container {
+    display: flex;
+    gap: var(--spacing-md);
+    flex: 1;
+  }
+  
+  .search-container {
+    flex: 1;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray);
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    margin-bottom: 0;
+  }
+  
+  .filters-container {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+  
+  .filter-select {
+    padding: 0.75rem;
+    border: 1px solid var(--gray);
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    margin-bottom: 0;
+  }
+  
+  .users-table-container {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    overflow-x: auto;
+  }
+  
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .users-table th {
+    font-weight: 600;
+    color: var(--heading-color);
+    background-color: #f8f9fa;
+  }
+  
+  .users-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .users-table tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .inactive-user {
+    opacity: 0.7;
+  }
+  
+  .role-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .role-badge.admin {
+    background-color: rgba(67, 97, 238, 0.2);
+    color: var(--primary);
+  }
+  
+  .role-badge.supervisor {
+    background-color: rgba(241, 196, 15, 0.2);
+    color: var(--warning);
+  }
+  
+  .role-badge.contractor {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: var(--success);
+  }
+  
+  .status-indicator {
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .status-indicator.active {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: var(--success);
+  }
+  
+  .status-indicator.inactive {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: var(--danger);
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+  
+  .btn-edit,
+  .btn-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-edit:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+  }
+  
+  .btn-delete:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+  }
+  
+  .user-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .user-modal {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 600px;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .user-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .user-modal-header h2 {
+    margin-bottom: 0;
+    color: var(--heading-color);
+  }
+  
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray);
+    transition: color 0.3s ease;
+  }
+  
+  .btn-close:hover {
+    color: var(--danger);
+  }
+  
+  .user-modal-body {
+    padding: var(--spacing-lg);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .form-group {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+    color: var(--dark);
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray);
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  
+  .user-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border-top: 1px solid #eaeaea;
+  }
+  
+  .btn-secondary {
+    background-color: var(--light);
+    color: var(--dark);
+    border: 1px solid var(--gray);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--gray);
+    color: white;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 1024px) {
+    .search-filter-container {
+      flex-direction: column;
+    }
+    
+    .filters-container {
+      width: 100%;
+    }
+    
+    .filter-select {
+      flex: 1;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .user-management-actions {
+      flex-direction: column;
+      gap: var(--spacing-md);
+      align-items: stretch;
+    }
+    
+    .filters-container {
+      flex-direction: column;
+    }
+    
+    .users-table th:nth-child(4),
+    .users-table td:nth-child(4),
+    .users-table th:nth-child(6),
+    .users-table td:nth-child(6) {
+      display: none;
+    }
+    
+    .user-modal {
+      max-width: 90%;
+      max-height: 90vh;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .users-table th:nth-child(3),
+    .users-table td:nth-child(3) {
+      display: none;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+    
+    .user-modal-footer {
+      flex-direction: column;
+    }
+    
+    .btn-secondary,
+    .btn-primary {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  
