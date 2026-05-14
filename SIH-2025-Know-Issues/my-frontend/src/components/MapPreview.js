@@ -51,9 +51,7 @@ const MapPreview = () => {
    * ---------------------------------------------------------------------
    * Loads the Google Maps script with the API key.
    **/
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyDB8AhMJd6xF9VVURQ_UWVTYJ_gkhUjkAY",
-  });
+
   
   /**
    * Mock Data: mockIssues
