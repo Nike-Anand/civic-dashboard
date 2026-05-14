@@ -4,9 +4,7 @@ import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps
 const MapVisualization = ({ issues }) => {
   const [selectedIssue, setSelectedIssue] = useState(null);
   
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyDys9hUSbPvTwgQEG-GJ7YqOVXlYGuOPpI"
-  });
+
   
   const mapContainerStyle = {
     width: '100%',
